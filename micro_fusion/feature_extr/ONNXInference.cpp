@@ -9,7 +9,7 @@ namespace mc {
 
 std::wstring s2ws(const std::string &s) {
   size_t convertedChars = 0;
-  std::string curLocale = setlocale(LC_ALL, NULL); // curLocale="C"
+  std::string curLocale = setlocale(LC_ALL, NULL);  // curLocale="C"
   setlocale(LC_ALL, "chs");
   const char *source = s.c_str();
   size_t charNum = sizeof(char) * s.size() + 1;
@@ -24,7 +24,8 @@ std::wstring s2ws(const std::string &s) {
 
 #endif
 
-template <typename T> T VectorProduct(const std::vector<T> &v) {
+template <typename T>
+T VectorProduct(const std::vector<T> &v) {
   return accumulate(v.begin(), v.end(), 1, std::multiplies<T>());
 }
 
@@ -77,8 +78,9 @@ ONNXInference::ONNXInference(const std::string &name,
 };
 
 std::vector<float> ONNXInference::Preprocess(const std::vector<cv::Mat> &imgs,
+                                             size_t batchsize,
                                              uint8_t input_node_idx) const {
-  auto input_dims = std::get<0>(GetIODims(imgs.size())).at(input_node_idx);
+  auto input_dims = std::get<0>(GetIODims(batchsize)).at(input_node_idx);
   assert(input_dims.at(0) >= imgs.size());
   auto input_size = VectorProduct(input_dims);
 
@@ -106,10 +108,10 @@ std::vector<float> ONNXInference::Preprocess(const std::vector<cv::Mat> &imgs,
   return input_tensor_values;
 }
 
-std::vector<std::vector<float>>
-ONNXInference::Postprocess(const std::vector<float> &output_tensor_values,
-                           uint8_t output_node_idx) const {
-  auto output_dims = std::get<1>(GetIODims(1)).at(output_node_idx);
+std::vector<std::vector<float>> ONNXInference::Postprocess(
+    const std::vector<float> &output_tensor_values, size_t batchsize,
+    uint8_t output_node_idx) const {
+  auto output_dims = std::get<1>(GetIODims(batchsize)).at(output_node_idx);
   auto output_size = VectorProduct(output_dims);
   std::vector<std::vector<float>> post_values;
   for (int i = 0; i < output_dims.at(0); ++i) {
@@ -123,7 +125,8 @@ ONNXInference::Postprocess(const std::vector<float> &output_tensor_values,
 }
 
 std::vector<std::vector<float>> ONNXInference::Process(
-    std::vector<std::vector<float>> &input_tensor_values) const {
+    std::vector<std::vector<float>> &input_tensor_values,
+    size_t batchsize) const {
   std::vector<Ort::Value> input_tensors;
   std::vector<Ort::Value> output_tensors;
   input_tensors.reserve(input_count_);
@@ -131,7 +134,7 @@ std::vector<std::vector<float>> ONNXInference::Process(
 
   Ort::MemoryInfo memoryInfo = Ort::MemoryInfo::CreateCpu(
       OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeDefault);
-  auto [input_dims, output_dims] = GetIODims(input_tensor_values.size());
+  auto [input_dims, output_dims] = GetIODims(batchsize);
 
   std::vector<std::vector<float>> output_tensor_values;
   for (size_t i = 0; i < output_count_; ++i) {
@@ -185,4 +188,4 @@ ONNXInference::GetIODims(uint8_t batchsize) const {
   }
   return std::make_tuple(input_dims, output_dims);
 };
-} // namespace mc
+}  // namespace mc

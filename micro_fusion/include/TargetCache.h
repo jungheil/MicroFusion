@@ -18,29 +18,31 @@
 
 namespace mc {
 class TargetCache {
-public:
+ public:
   using Ptr = std::shared_ptr<TargetCache>;
   TargetCache() = default;
   virtual ~TargetCache() = default;
-  virtual void UpdateTarget(uint64_t target_id, DecTarget::Ptr target_ptr) = 0;
+  virtual void UpdateTarget(const std::string &uuid,
+                            DecTarget::Ptr target_ptr) = 0;
   virtual void AddTarget(FusTarget::Ptr target) = 0;
-  virtual FusTarget::Ptr GetTarget(uint64_t target_id) = 0;
+  virtual FusTarget::Ptr GetTarget(const std::string &uuid) = 0;
   virtual std::vector<FusTarget::Ptr> GetAllTrackTargets() = 0;
 };
 
 class LRUTargetCache : public TargetCache {
-public:
+ public:
   explicit LRUTargetCache(size_t cache_size, time_t expire_time)
       : cache_(cache_size, expire_time) {}
-  void UpdateTarget(uint64_t target_id, DecTarget::Ptr target_ptr) override;
+  void UpdateTarget(const std::string &uuid,
+                    DecTarget::Ptr target_ptr) override;
   void AddTarget(FusTarget::Ptr target) override;
-  FusTarget::Ptr GetTarget(uint64_t target_id) override;
+  FusTarget::Ptr GetTarget(const std::string &uuid) override;
   std::vector<FusTarget::Ptr> GetAllTrackTargets() override;
 
-protected:
-  LRUCache<size_t, FusTarget::Ptr> cache_;
+ protected:
+  LRUCache<std::string, FusTarget::Ptr> cache_;
 };
 
-} // namespace mc
+}  // namespace mc
 
-#endif // MICRO_FUSION_TARGETCACHE_H
+#endif  // MICRO_FUSION_TARGETCACHE_H

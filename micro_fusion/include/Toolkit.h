@@ -13,8 +13,8 @@
 #include <tuple>
 
 namespace mc {
-std::tuple<Eigen::Vector3d, Eigen::Vector3d, double>
-GetRandomTarget(Eigen::Vector3d target_position) {
+std::tuple<Eigen::Vector3d, Eigen::Vector3d, double> GetRandomTarget(
+    Eigen::Vector3d target_position) {
   Eigen::Vector3d target_orientation =
       Eigen::Vector3d::Random() * (rand() % 100);
   Eigen::Vector3d measurement_position = target_position - target_orientation;
@@ -23,5 +23,5 @@ GetRandomTarget(Eigen::Vector3d target_position) {
                          target_distance);
 }
 
-} // namespace mc
-#endif // MICRO_FUSION_TOOLKIT_H
+}  // namespace mc
+#endif  // MICRO_FUSION_TOOLKIT_H

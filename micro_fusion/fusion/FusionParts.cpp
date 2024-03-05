@@ -15,8 +15,19 @@
 #include <vector>
 
 #include "BaseObject.h"
+#include "feature_extr/FeatureExtr.h"
 
 namespace mc {
+
+BaseFeatureExtrPart::BaseFeatureExtrPart(
+    std::unordered_map<std::string, std::string> weights_path,
+    int intra_threads) {
+  assert(weights_path.find("common") != weights_path.end());
+  extr_map_["common"] = std::make_unique<OnnxFeatureExtr>(
+      "common", weights_path.find("common")->second, intra_threads);
+};
+
+// TODO 根据设定类型选择不同的特征提取器
 void BaseFeatureExtrPart::Get(std::vector<DecTarget::Ptr> &targets) const {
   std::vector<cv::Mat> imgs;
   imgs.reserve(targets.size());
@@ -26,7 +37,6 @@ void BaseFeatureExtrPart::Get(std::vector<DecTarget::Ptr> &targets) const {
   auto feature_list = extr_map_.find("common")->second->GetTargetsFeature(imgs);
   for (size_t i = 0; i < feature_list.size(); ++i) {
     targets[i]->set_img_feature_ptr(feature_list[i]);
-    targets[i]->set_feature_type(std::string("common"));
   }
 }
 void BasePositionPart::Get(std::vector<FusTarget::Ptr> &targets) const {
@@ -59,8 +69,7 @@ std::vector<std::vector<double>> BaseTargetMatchPart::ClacCosts(
         target_series = his_targets[j]->GetLatestSeries();
       }
       assert(target_series != nullptr && "Target series not found!");
-      if (targets[i]->get_img_feature_type() ==
-          target_series->get_img_feature_type()) {
+      if (targets[i]->get_target_type() == target_series->get_img_type()) {
         auto l2_distance =
             (*(target_series->GetLatestTarget()->get_img_feature_ptr()) -
              *(targets[i]->get_img_feature_ptr()))
@@ -72,10 +81,10 @@ std::vector<std::vector<double>> BaseTargetMatchPart::ClacCosts(
   return cost_matrix;
 }
 
-std::vector<uint64_t>
-BaseTargetMatchPart::Get(std::vector<DecTarget::Ptr> &targets,
-                         std::vector<FusTarget::Ptr> &his_targets_dict_) const {
-  std::vector<uint64_t> ret(targets.size(), 0);
+std::vector<std::string> BaseTargetMatchPart::Get(
+    std::vector<DecTarget::Ptr> &targets,
+    std::vector<FusTarget::Ptr> &his_targets_dict_) const {
+  std::vector<std::string> ret(targets.size());
   auto groups = subgroup_ptr_->Get(targets, his_targets_dict_);
   for (auto &g : groups) {
     auto costs = ClacCosts(g.first, g.second);
@@ -89,11 +98,11 @@ BaseTargetMatchPart::Get(std::vector<DecTarget::Ptr> &targets,
       }
       auto target_feature = target_series->get_img_feature_ptr();
       if ((*source_feature - *target_feature).norm() < img_feature_threshold_) {
-        ret[a.first] = g.second[a.second]->get_target_id();
+        ret[a.first] = g.second[a.second]->get_uuid();
       }
     }
   }
   return ret;
 }
 
-} // namespace mc
+}  // namespace mc

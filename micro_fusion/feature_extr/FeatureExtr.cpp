@@ -15,12 +15,13 @@ namespace mc {
 std::vector<std::shared_ptr<Eigen::VectorXf>>
 OnnxFeatureExtr::GetTargetsFeature(std::vector<cv::Mat> const &imgs) const {
   std::vector<std::shared_ptr<Eigen::VectorXf>> targets_feature;
-  auto image_tensor = onnx_inference_.Preprocess(imgs, 0);
+  int batchsize = imgs.size();
+  auto image_tensor = onnx_inference_.Preprocess(imgs, batchsize, 0);
   auto input = std::vector<std::vector<float>>{image_tensor};
-  auto output = onnx_inference_.Process(input);
+  auto output = onnx_inference_.Process(input, batchsize);
 
   auto features =
-      onnx_inference_.Postprocess(output.at(output_idx_), output_idx_);
+      onnx_inference_.Postprocess(output[output_idx_], batchsize, output_idx_);
   for (auto &f : features) {
     auto feature = Eigen::Map<Eigen::VectorXf>(f.data(), f.size());
     feature = feature.normalized();
@@ -28,4 +29,4 @@ OnnxFeatureExtr::GetTargetsFeature(std::vector<cv::Mat> const &imgs) const {
   }
   return targets_feature;
 }
-} // namespace mc
+}  // namespace mc

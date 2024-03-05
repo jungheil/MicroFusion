@@ -42,8 +42,8 @@ double PositionFusionBayes::GetConfidence(Eigen::Vector3d const &x_i,
   return confidence;
 }
 
-std::vector<int64_t>
-PositionFusionBayes::GetConfidenceTarget(std::vector<DecTarget::Ptr> targets) {
+std::vector<int64_t> PositionFusionBayes::GetConfidenceTarget(
+    std::vector<DecTarget::Ptr> targets) {
   Eigen::MatrixXd confidence_matrix(targets.size(), targets.size());
   confidence_matrix.setZero();
   for (int i = 0; i < targets.size(); ++i) {
@@ -89,4 +89,4 @@ Eigen::Vector3d PositionFusionBayes::Get(std::vector<DecTarget::Ptr> targets) {
   return dsum.inverse() * nsum;
 }
 
-} // namespace mc
+}  // namespace mc

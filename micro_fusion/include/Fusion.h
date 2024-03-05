@@ -15,7 +15,6 @@
 #include <vector>
 
 #include "BaseObject.h"
-#include "Common.h"
 #include "TargetCache.h"
 
 namespace mc {
@@ -36,7 +35,7 @@ protected:
 class FusionTargetMatchPart {
 public:
   using Ptr = std::shared_ptr<FusionTargetMatchPart>;
-  virtual std::vector<uint64_t>
+  virtual std::vector<std::string>
   Get(std::vector<DecTarget::Ptr> &targets,
       std::vector<FusTarget::Ptr> &his_targets) const = 0;
 };

@@ -9,18 +9,18 @@
 #include "TargetCache.h"
 
 namespace mc {
-void LRUTargetCache::UpdateTarget(uint64_t target_id,
+void LRUTargetCache::UpdateTarget(const std::string &uuid,
                                   DecTarget::Ptr target_ptr) {
-  assert(cache_.exist(target_id));
-  auto fus_target_ptr = cache_.get(target_id, true);
+  assert(cache_.exist(uuid));
+  auto fus_target_ptr = cache_.get(uuid, true);
   fus_target_ptr->AddTarget(target_ptr);
 }
 void LRUTargetCache::AddTarget(FusTarget::Ptr target) {
-  cache_.put(target->get_target_id(), target);
+  cache_.put(target->get_uuid(), target);
 }
 
-FusTarget::Ptr LRUTargetCache::GetTarget(uint64_t target_id) {
-  return cache_.get(target_id, false);
+FusTarget::Ptr LRUTargetCache::GetTarget(const std::string &uuid) {
+  return cache_.get(uuid, false);
 }
 
 std::vector<FusTarget::Ptr> LRUTargetCache::GetAllTrackTargets() {

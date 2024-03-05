@@ -23,8 +23,8 @@ MIPAssignment::MIPAssignment() {
 #endif
   assert(solver_);
 }
-std::vector<std::pair<size_t, size_t>>
-MIPAssignment::Get(std::vector<std::vector<double>> costs) {
+std::vector<std::pair<size_t, size_t>> MIPAssignment::Get(
+    std::vector<std::vector<double>> costs) {
   const int num_workers = costs.size();
   const int num_tasks = costs[0].size();
 
@@ -112,9 +112,9 @@ NeighborsSubGroup::GetNeighborsMap(std::vector<DecTarget::Ptr> &targets,
   return ret;
 }
 
-std::vector<TargetAssignmentGroup>
-NeighborsSubGroup::Get(std::vector<DecTarget::Ptr> &targets,
-                       std::vector<FusTarget::Ptr> &his_targets) {
+std::vector<TargetAssignmentGroup> NeighborsSubGroup::Get(
+    std::vector<DecTarget::Ptr> &targets,
+    std::vector<FusTarget::Ptr> &his_targets) {
   auto map = GetNeighborsMap(targets, his_targets);
   auto merged = MergeTarget(map);
   std::vector<TargetAssignmentGroup> ret;
@@ -182,4 +182,4 @@ NeighborsSubGroup::MergeTarget(
   return ret;
 }
 
-} // namespace mc
+}  // namespace mc

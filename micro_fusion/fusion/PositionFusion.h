@@ -18,7 +18,7 @@
 namespace mc {
 // 计算位置概率密度
 class PositionProbabilityByDist {
-public:
+ public:
   static double Get(const Eigen::Vector3d &x, const Eigen::Vector3d &mu,
                     const Eigen::Matrix3d &covariance) {
     if (covariance != covariance_) {
@@ -31,13 +31,13 @@ public:
            exp(-0.5 * (x - mu).transpose() * inv_cache_ * (x - mu));
   }
 
-private:
+ private:
   static Eigen::Matrix3d covariance_;
   static double num_cache_;
   static Eigen::Matrix3d inv_cache_;
 };
 class PositionFusion {
-public:
+ public:
   using Ptr = std::shared_ptr<PositionFusion>;
   using UniPtr = std::unique_ptr<PositionFusion>;
 
@@ -47,19 +47,19 @@ public:
 };
 // 目标融合
 class PositionFusionBayes : public PositionFusion {
-public:
+ public:
   PositionFusionBayes() = default;
   ~PositionFusionBayes() override = default;
   static double GetConfidence(Eigen::Vector3d const &x_i,
                               Eigen::Vector3d const &x_j,
                               Eigen::Matrix3d const &covariance_i);
 
-  static std::vector<int64_t>
-  GetConfidenceTarget(std::vector<DecTarget::Ptr> targets);
+  static std::vector<int64_t> GetConfidenceTarget(
+      std::vector<DecTarget::Ptr> targets);
 
   Eigen::Vector3d Get(std::vector<DecTarget::Ptr> targets) override;
 };
 
-} // namespace mc
+}  // namespace mc
 
-#endif // POSITION_FILTER_POSITIONFUSION_H
+#endif  // POSITION_FILTER_POSITIONFUSION_H

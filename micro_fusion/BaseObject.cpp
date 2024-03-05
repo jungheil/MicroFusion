@@ -10,8 +10,8 @@
 
 namespace mc {
 
-uint64_t DecTargetSeries::target_id_gen_ = 1;
-uint64_t FusTarget::target_id_gen_ = 1;
+// uint64_t DecTargetSeries::target_id_gen_ = 1;
+// uint64_t FusTarget::target_id_gen_ = 1;
 
 Eigen::Vector3d DecTarget::CalcTargetPosition() const {
   return measurement_position_ +
@@ -38,10 +38,10 @@ Eigen::Matrix3d DecTarget::CalcTargetCovariance(float_t vertical_coff,
 void DecTargetSeries::AddTarget(DecTarget::Ptr target_ptr) {
   assert(target_ptr->get_uav_info()->get_uav_id() == uav_info_->get_uav_id() &&
          "UAV ID not match!");
-  target_list_.put(target_ptr->get_update_time(), target_ptr);
+  target_list_.put(target_ptr->get_time_stamp(), target_ptr);
   img_feature_ptr_ = target_ptr->get_img_feature_ptr();
-  img_feature_type_ = target_ptr->get_img_feature_type();
-  update_time_ = target_ptr->get_update_time();
+  img_type_ = target_ptr->get_target_type();
+  update_time_ = target_ptr->get_time_stamp();
 }
 
 void FusTarget::AddTarget(DecTarget::Ptr target_ptr) {
@@ -55,7 +55,8 @@ void FusTarget::AddTarget(DecTarget::Ptr target_ptr) {
     target_series_list_.put(target_ptr->get_uav_info()->get_uav_id(),
                             target_series_ptr);
   }
-  update_time_ = target_ptr->get_update_time();
+  update_time_ = target_ptr->get_time_stamp();
+  target_type_ = target_ptr->get_target_type();
 }
 DecTargetSeries::Ptr FusTarget::GetTargetSeries(uint64_t uav_id) {
   if (target_series_list_.exist(uav_id)) {
@@ -73,4 +74,4 @@ DecTargetSeries::Ptr FusTarget::GetTargetSeries() {
   }
 }
 
-} // namespace mc
+}  // namespace mc

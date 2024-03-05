@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(microfusion VERSION 1.0.0)
+project(microfusion VERSION 1.0.1)
 
 if(WIN32)
     message(STATUS "Detected Windows")
@@ -71,9 +71,10 @@ include_directories(${PROJECT_SOURCE_DIR}/include
 aux_source_directory(${PROJECT_SOURCE_DIR}/assignment ASSIGNMENT_EXTR_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/feature_extr FEATURE_EXTR_SRC_LIST)
 aux_source_directory(${PROJECT_SOURCE_DIR}/fusion FUSION_SRC_LIST)
+aux_source_directory(${PROJECT_SOURCE_DIR}/persistent PERSISTENT_SRC_LIST)
 
 
-add_library(${PROJECT_NAME} ${SRC_LIST} ${FEATURE_EXTR_SRC_LIST} ${ASSIGNMENT_EXTR_SRC_LIST} ${FUSION_SRC_LIST} )
+add_library(${PROJECT_NAME} ${SRC_LIST} ${FEATURE_EXTR_SRC_LIST} ${ASSIGNMENT_EXTR_SRC_LIST} ${PERSISTENT_SRC_LIST} ${FUSION_SRC_LIST} )
 target_link_libraries(${PROJECT_NAME} PRIVATE onnxruntime ${GSL_LINK_LIB}  ${ortools_LINK_LIB})
 target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen ${OpenCV_LIBS})
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})

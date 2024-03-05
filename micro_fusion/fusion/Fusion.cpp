@@ -25,8 +25,12 @@ void BaseFusion::InitParts() {
                                                         search_radius_);
 }
 
-std::vector<FusTarget::Ptr>
-BaseFusion::AddDecTarget(std::vector<DecTarget::Ptr> dec_targets) {
+std::vector<FusTarget::Ptr> BaseFusion::AddDecTarget(
+    std::vector<DecTarget::Ptr> dec_targets) {
+  for (const auto &t : dec_targets) {
+    assert(t->get_uav_info() != nullptr);
+  }
+
   feature_extr_->Get(dec_targets);
   auto his_targets = target_cache_ptr_->GetAllTrackTargets();
   // split dec_targets by uav
@@ -43,7 +47,7 @@ BaseFusion::AddDecTarget(std::vector<DecTarget::Ptr> dec_targets) {
   for (auto &it : dec_targets_map) {
     auto target_id = target_match_->Get(it.second, his_targets);
     for (size_t i = 0; i < it.second.size(); ++i) {
-      if (target_id[i] == 0) {
+      if (target_id[i].empty()) {
         auto fus_target_ptr = std::make_shared<FusTarget>(
             fustarget_size_, fustarget_expire_time_, series_size_);
         fus_target_ptr->AddTarget(it.second[i]);
@@ -62,4 +66,4 @@ BaseFusion::AddDecTarget(std::vector<DecTarget::Ptr> dec_targets) {
   return active_targets;
 }
 
-} // namespace mc
+}  // namespace mc

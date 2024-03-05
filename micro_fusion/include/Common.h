@@ -18,13 +18,14 @@
 #include <tuple>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #define M_PI 3.14159265358979323846 /* pi */
 
 namespace mc {
 
 class Singleton {
-public:
+ public:
   static Singleton &GetInstance() {
     static std::once_flag s_flag;
     std::call_once(s_flag, [&]() { instance_.reset(new Singleton); });
@@ -34,18 +35,19 @@ public:
 
   ~Singleton() = default;
 
-private:
+ private:
   Singleton() = default;
 
   Singleton(const Singleton &) = delete;
   Singleton &operator=(const Singleton &) = delete;
 
-private:
+ private:
   static std::unique_ptr<Singleton> instance_;
 };
 
-template <class KEY_T, class VAL_T> class LRUCache {
-private:
+template <class KEY_T, class VAL_T>
+class LRUCache {
+ private:
   std::list<std::pair<KEY_T, VAL_T>> item_list;
   std::unordered_map<KEY_T, std::tuple<decltype(item_list.begin()), time_t>>
       item_map;
@@ -53,7 +55,7 @@ private:
   // expire time 60s
   time_t expire_time_;
 
-private:
+ private:
   void clean(void) {
     while (item_map.size() > cache_size_) {
       auto last_it = item_list.end();
@@ -77,7 +79,7 @@ private:
     }
   }
 
-public:
+ public:
   LRUCache(int cache_size_, time_t expire_time)
       : cache_size_(cache_size_), expire_time_(expire_time) {}
 
@@ -110,5 +112,30 @@ public:
   const std::list<std::pair<KEY_T, VAL_T>> &get_data() { return item_list; }
   size_t size() { return item_map.size(); }
 };
-} // namespace mc
-#endif // MICRO_FUSION_COMMON_H
+
+template <typename T>
+struct KDDPointCloud {
+  std::vector<T> pts;
+
+  [[nodiscard]] inline size_t kdtree_get_point_count() const {
+    return pts.size();
+  }
+
+  [[nodiscard]] inline double kdtree_get_pt(const size_t idx,
+                                            const size_t dim) const {
+    if (dim == 0)
+      return pts[idx].x;
+    else if (dim == 1)
+      return pts[idx].y;
+    else
+      return pts[idx].z;
+  }
+
+  template <class BBOX>
+  bool kdtree_get_bbox(BBOX & /* bb */) const {
+    return false;
+  }
+};
+
+}  // namespace mc
+#endif  // MICRO_FUSION_COMMON_H

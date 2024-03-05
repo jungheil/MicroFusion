@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+message PMat {
+   bytes data = 1;
+   int64 size = 2;
+   int32 cols = 3;
+   int32 rows = 4;
+}
+
+message PCoordinate {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message PTarget {
+   string uuid = 1;
+   string type = 2;
+   PMat image = 3;
+   PCoordinate position = 4;
+   int64 time_stamp = 5;
+}
+
+message PTargetArray {
+   string uuid = 1;
+   string type = 2;
+   PCoordinate latest_position = 3;
+   int64 update_time = 4;
+   repeated PTarget targets = 5;
+}
+
+
+
+message PIndexPoint {
+   string uuid = 1;
+   float x = 2;
+   float y = 3;
+   float z = 4;
+}
+
+message PIndexPointArray {
+   repeated PIndexPoint points = 1;
+}

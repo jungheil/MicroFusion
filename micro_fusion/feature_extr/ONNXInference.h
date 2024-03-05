@@ -8,7 +8,7 @@
 
 #ifndef MICRO_FUSION_ONNXINFERENCE_H
 #define MICRO_FUSION_ONNXINFERENCE_H
-#include <iostream>
+
 #include <memory>
 #include <opencv2/opencv.hpp>
 #include <vector>
@@ -18,7 +18,7 @@
 namespace mc {
 
 class ONNXInference {
-public:
+ public:
   ONNXInference(const std::string &name, const std::string &model_path,
                 int intra_threads);
 
@@ -27,14 +27,15 @@ public:
   GetIODims(uint8_t batchsize) const;
 
   [[nodiscard]] std::vector<float> Preprocess(const std::vector<cv::Mat> &imgs,
+                                              size_t batchsize,
                                               uint8_t input_node_idx) const;
 
-  [[nodiscard]] std::vector<std::vector<float>>
-  Postprocess(const std::vector<float> &output_tensor_values,
-              uint8_t output_node_idx) const;
+  [[nodiscard]] std::vector<std::vector<float>> Postprocess(
+      const std::vector<float> &output_tensor_values, size_t batchsize,
+      uint8_t output_node_idx) const;
 
-  std::vector<std::vector<float>>
-  Process(std::vector<std::vector<float>> &input_tensors) const;
+  std::vector<std::vector<float>> Process(
+      std::vector<std::vector<float>> &input_tensors, size_t batchsize) const;
 
   [[nodiscard]] size_t get_input_count() const { return input_count_; }
   [[nodiscard]] size_t get_output_count() const { return output_count_; }
@@ -45,7 +46,7 @@ public:
     return output_node_names_;
   }
 
-protected:
+ protected:
   std::unique_ptr<Ort::Env> env_;
   std::unique_ptr<Ort::Session> session_;
   std::unique_ptr<Ort::AllocatorWithDefaultOptions> allocator_;
@@ -57,6 +58,6 @@ protected:
   std::vector<std::vector<int64_t>> output_node_dims_;
 };
 
-} // namespace mc
+}  // namespace mc
 
-#endif // MICRO_FUSION_ONNXINFERENCE_H
+#endif  // MICRO_FUSION_ONNXINFERENCE_H

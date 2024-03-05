@@ -17,21 +17,13 @@
 #include <utility>
 #include <vector>
 
+#include "Feature.h"
 #include "ONNXInference.h"
 
 namespace mc {
-class FeatureExtr {
-public:
-  using Ptr = std::shared_ptr<FeatureExtr>;
-  using UniPtr = std::unique_ptr<FeatureExtr>;
-  FeatureExtr() = default;
-  virtual ~FeatureExtr() = default;
-  [[nodiscard]] virtual std::vector<std::shared_ptr<Eigen::VectorXf>>
-  GetTargetsFeature(std::vector<cv::Mat> const &imgs) const = 0;
-};
 
 class OnnxFeatureExtr : public FeatureExtr {
-public:
+ public:
   explicit OnnxFeatureExtr(std::string name, std::string model_path,
                            int intra_threads)
       : onnx_inference_(std::move(name), std::move(model_path), intra_threads) {
@@ -44,13 +36,13 @@ public:
     };
   }
   ~OnnxFeatureExtr() override = default;
-  [[nodiscard]] std::vector<std::shared_ptr<Eigen::VectorXf>>
-  GetTargetsFeature(std::vector<cv::Mat> const &imgs) const override;
+  [[nodiscard]] std::vector<std::shared_ptr<Eigen::VectorXf>> GetTargetsFeature(
+      std::vector<cv::Mat> const &imgs) const override;
 
-private:
+ private:
   ONNXInference onnx_inference_;
   size_t output_idx_ = 0;
 };
-} // namespace mc
+}  // namespace mc
 
-#endif // MICRO_FUSION_FEATUREEXTR_H
+#endif  // MICRO_FUSION_FEATUREEXTR_H
