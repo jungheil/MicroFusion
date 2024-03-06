@@ -8,13 +8,12 @@
 
 #ifndef MICRO_FUSION_FEATUREEXTR_H
 #define MICRO_FUSION_FEATUREEXTR_H
+
 #include <Eigen/Eigen>
 #include <cassert>
-#include <iostream>
 #include <memory>
 #include <opencv2/opencv.hpp>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "Feature.h"

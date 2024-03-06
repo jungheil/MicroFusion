@@ -8,7 +8,50 @@
 
 #include "BaseObject.h"
 
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+
 namespace mc {
+
+DecTarget::DecTarget(UAVInfo::Ptr uav_ptr, cv::Mat img, std::string img_type,
+                     Eigen::Vector3d measurement_position,
+                     Eigen::Vector3d target_orientation,
+                     float_t target_distance, double vertical_coff,
+                     double horizontal_coff)
+    : uuid_(boost::uuids::to_string(boost::uuids::random_generator()())),
+      uav_info_(uav_ptr),
+      img_(img),
+      target_type_(img_type),
+      measurement_position_(measurement_position),
+      target_orientation_(target_orientation),
+      target_distance_(target_distance) {
+  estimate_position_ = CalcTargetPosition();
+  estimate_covariance_ = CalcTargetCovariance(vertical_coff, horizontal_coff);
+}
+
+DecTarget::DecTarget(UAVInfo::Ptr uav_ptr, cv::Mat img, std::string img_type,
+                     Eigen::Vector3d target_position)
+    : uuid_(boost::uuids::to_string(boost::uuids::random_generator()())),
+      uav_info_(uav_ptr),
+      img_(img),
+      target_type_(img_type) {
+  estimate_position_ = target_position;
+  estimate_covariance_ = Eigen::Matrix3d::Identity();
+}
+
+DecTargetSeries::DecTargetSeries(std::shared_ptr<UAVInfo> uav_info,
+                                 size_t target_list_size)
+    : uuid_(boost::uuids::to_string(boost::uuids::random_generator()())),
+      uav_info_(uav_info),
+      target_list_(target_list_size, 0) {}
+
+FusTarget::FusTarget(size_t max_target_num, time_t max_cache_time,
+                     size_t target_history_size)
+    : uuid_(boost::uuids::to_string(boost::uuids::random_generator()())),
+      target_series_list_(max_target_num, max_cache_time) {
+  target_history_size_ = target_history_size;
+};
 
 // uint64_t DecTargetSeries::target_id_gen_ = 1;
 // uint64_t FusTarget::target_id_gen_ = 1;

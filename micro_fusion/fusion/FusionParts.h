@@ -49,7 +49,7 @@ class BaseTargetMatchPart : public FusionTargetMatchPart {
   explicit BaseTargetMatchPart(float img_feature_threshold,
                                double search_radius)
       : img_feature_threshold_(img_feature_threshold) {
-    assignment_ptr_ = std::make_unique<MIPAssignment>();
+    assignment_ptr_ = std::make_unique<KMAssignment>();
     subgroup_ptr_ = std::make_unique<NeighborsSubGroup>(search_radius);
   }
   virtual std::vector<std::string> Get(

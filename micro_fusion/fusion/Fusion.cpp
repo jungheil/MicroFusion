@@ -17,7 +17,6 @@
 
 namespace mc {
 void BaseFusion::InitParts() {
-  // TODO Args
   feature_extr_ =
       std::make_shared<BaseFeatureExtrPart>(weights_path_, intra_threads_);
   position_fusion_ = std::make_shared<BasePositionPart>(position_active_time_);

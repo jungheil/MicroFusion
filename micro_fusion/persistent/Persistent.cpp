@@ -35,10 +35,11 @@ PTarget PTargetGenerator(FusTarget::Ptr target) {
 BasePersistent::BasePersistent(
     std::string db_path, float search_radius,
     std::unordered_map<std::string, std::string> weights_path,
-    int intra_threads, float match_threshold)
+    int intra_threads, float match_threshold, time_t match_delay_time)
     : Persistent(std::move(db_path)),
       search_radius_(search_radius),
-      match_threshold(match_threshold) {
+      match_threshold_(match_threshold),
+      match_delay_time_(match_delay_time) {
   assert(weights_path.find("common") != weights_path.end());
   extr_map_["common"] = std::make_unique<OnnxFeatureExtr>(
       "common", weights_path.find("common")->second, intra_threads);
@@ -53,6 +54,14 @@ std::string BasePersistent::LookUpTarget(FusTarget::Ptr target) {
   if (neighbour.empty()) {
     return "";
   }
+
+  std::vector<PTargetArray> his_neighbour;
+  std::copy_if(neighbour.begin(), neighbour.end(),
+               std::back_inserter(his_neighbour), [&](const PTargetArray &t) {
+                 return t.targets(t.targets_size() - 1).time_stamp() <
+                        time(nullptr) - match_delay_time_;
+               });
+
   std::vector<cv::Mat> imgs;
   for (const auto &n : neighbour) {
     auto target = n.targets(n.targets_size() - 1);
@@ -72,7 +81,7 @@ std::string BasePersistent::LookUpTarget(FusTarget::Ptr target) {
   }
   // get the nearest neighbour idx
   auto min_idx = std::min_element(dists.begin(), dists.end()) - dists.begin();
-  if (dists[min_idx] > match_threshold) {
+  if (dists[min_idx] > match_threshold_) {
     return "";
   } else {
     UpdateTarget(target, neighbour[min_idx].uuid());

@@ -9,6 +9,7 @@
 #ifndef MICRO_FUSION_PERSISTENT_H
 #define MICRO_FUSION_PERSISTENT_H
 
+#include <ctime>
 #include <unordered_map>
 
 #include "BaseObject.h"
@@ -33,7 +34,7 @@ class BasePersistent : public Persistent {
   explicit BasePersistent(
       std::string db_path, float search_radius,
       std::unordered_map<std::string, std::string> weights_path,
-      int intra_threads, float match_threshold);
+      int intra_threads, float match_threshold, time_t match_delay_time);
 
   std::string LookUpTarget(FusTarget::Ptr target) override;
 
@@ -48,7 +49,8 @@ class BasePersistent : public Persistent {
 
  private:
   float search_radius_;
-  float match_threshold;
+  float match_threshold_;
+  time_t match_delay_time_;
   std::unordered_map<std::string, FeatureExtr::UniPtr> extr_map_{};
 };
 

@@ -8,84 +8,17 @@
 
 #include "Assignment.h"
 
-#include <memory>
 #include <utility>
 
-using namespace operations_research;
+#include "KM.h"
+
+// using namespace operations_research;
 
 namespace mc {
-MIPAssignment::MIPAssignment() {
-#ifdef MACRO_WIN32
-  solver_ = std::make_unique<MPSolver>(
-      "problem", MPSolver::OptimizationProblemType::GLOP_LINEAR_PROGRAMMING);
-#else
-  solver_ = std::unique_ptr<MPSolver>(MPSolver::CreateSolver("SCIP"));
-#endif
-  assert(solver_);
-}
-std::vector<std::pair<size_t, size_t>> MIPAssignment::Get(
+
+std::vector<std::pair<size_t, size_t>> KMAssignment::Get(
     std::vector<std::vector<double>> costs) {
-  const int num_workers = costs.size();
-  const int num_tasks = costs[0].size();
-
-  // Variables
-  // x[i][j] is an array of 0-1 variables, which will be 1
-  // if worker i is assigned to task j.
-  std::vector<std::vector<const MPVariable *>> x(
-      num_workers, std::vector<const MPVariable *>(num_tasks));
-  for (int i = 0; i < num_workers; ++i) {
-    for (int j = 0; j < num_tasks; ++j) {
-      x[i][j] = solver_->MakeIntVar(0, 1, "");
-    }
-  }
-
-  // Constraints
-  // Each worker is assigned to at most one task.
-  for (int i = 0; i < num_workers; ++i) {
-    LinearExpr worker_sum;
-    for (int j = 0; j < num_tasks; ++j) {
-      worker_sum += x[i][j];
-    }
-    solver_->MakeRowConstraint(worker_sum <= 1.0);
-  }
-  // Each task is assigned to exactly one worker.
-  for (int j = 0; j < num_tasks; ++j) {
-    LinearExpr task_sum;
-    for (int i = 0; i < num_workers; ++i) {
-      task_sum += x[i][j];
-    }
-    solver_->MakeRowConstraint(task_sum == 1.0);
-  }
-
-  // Objective.
-#ifndef MACRO_WIN32
-  MPObjective *const objective = solver_->MutableObjective();
-  for (int i = 0; i < num_workers; ++i) {
-    for (int j = 0; j < num_tasks; ++j) {
-      objective->SetCoefficient(x[i][j], costs[i][j]);
-    }
-  }
-  objective->SetMinimization();
-#endif
-
-  // Solve
-  const MPSolver::ResultStatus result_status = solver_->Solve();
-
-  if (result_status != MPSolver::OPTIMAL &&
-      result_status != MPSolver::FEASIBLE) {
-    return std::vector<std::pair<size_t, size_t>>{};
-  }
-  std::vector<std::pair<size_t, size_t>> ret;
-  for (size_t i = 0; i < num_workers; ++i) {
-    for (size_t j = 0; j < num_tasks; ++j) {
-      // Test if x[i][j] is 0 or 1 (with tolerance for floating point
-      // arithmetic).
-      if (x[i][j]->solution_value() > 0.5) {
-        ret.emplace_back(i, j);
-      }
-    }
-  }
-  return ret;
+  return KM::Get(costs);
 }
 
 std::unordered_map<size_t, std::vector<size_t>>

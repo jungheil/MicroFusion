@@ -16,16 +16,17 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
-#include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 
 #include "Common.h"
-#include "PTarget.pb.h"
+#ifdef MACRO_WIN32
+#include "PTarget3021012/PTarget.pb.h"
+#else
+#include "PTarget3012004/PTarget.pb.h"
+#endif
 #include "nanoflann.hpp"
-// #include "BaseObject.h"
 
 namespace mc {
 

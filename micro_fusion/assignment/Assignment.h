@@ -9,10 +9,6 @@
 #ifndef MICRO_FUSION_ASSIGNMENT_H
 #define MICRO_FUSION_ASSIGNMENT_H
 
-#ifdef MACRO_WIN32
-#define USE_GLOP
-#endif
-
 #include <memory>
 #include <unordered_map>
 #include <utility>
@@ -21,7 +17,6 @@
 #include "BaseObject.h"
 #include "Common.h"
 #include "nanoflann.hpp"
-#include "ortools/linear_solver/linear_solver.h"
 
 namespace mc {
 class Assignment {
@@ -34,15 +29,12 @@ class Assignment {
       std::vector<std::vector<double>> costs) = 0;
 };
 
-class MIPAssignment : public Assignment {
+class KMAssignment : public Assignment {
  public:
-  MIPAssignment();
-  ~MIPAssignment() override = default;
+  KMAssignment() = default;
+  ~KMAssignment() override = default;
   std::vector<std::pair<size_t, size_t>> Get(
       std::vector<std::vector<double>> costs) override;
-
- private:
-  std::unique_ptr<operations_research::MPSolver> solver_ = nullptr;
 };
 
 using TargetAssignmentGroup =

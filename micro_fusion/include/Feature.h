@@ -12,7 +12,7 @@
 #include <memory>
 
 #include "Eigen/Eigen"
-#include "opencv2/opencv.hpp"
+#include "opencv2/core.hpp"
 
 namespace mc {
 class FeatureExtr {
