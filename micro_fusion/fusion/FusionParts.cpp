@@ -74,7 +74,7 @@ std::vector<std::vector<double>> BaseTargetMatchPart::ClacCosts(
             (*(target_series->GetLatestTarget()->get_img_feature_ptr()) -
              *(targets[i]->get_img_feature_ptr()))
                 .norm();
-        cost_matrix[i][j] = l2_distance;
+        cost_matrix[i][j] = l2_distance + 1e-6;
       }
     }
   }

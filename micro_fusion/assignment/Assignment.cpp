@@ -18,7 +18,7 @@ namespace mc {
 
 std::vector<std::pair<size_t, size_t>> KMAssignment::Get(
     std::vector<std::vector<double>> costs) {
-  return KM::Get(costs);
+    return Assignment_KM(costs);
 }
 
 std::unordered_map<size_t, std::vector<size_t>>
@@ -54,10 +54,10 @@ std::vector<TargetAssignmentGroup> NeighborsSubGroup::Get(
   for (const auto &entry : merged) {
     std::vector<DecTarget::Ptr> source;
     std::vector<FusTarget::Ptr> target;
-    for (const auto &idx : entry.first) {
+    for (const auto &idx : entry.second) {
       source.push_back(targets[idx]);
     }
-    for (const auto &idx : entry.second) {
+    for (const auto &idx : entry.first) {
       target.push_back(his_targets[idx]);
     }
     ret.emplace_back(source, target);
@@ -82,11 +82,11 @@ NeighborsSubGroup::MergeTarget_(
     }
     visited_source[idx] = true;
     source.push_back(idx);
-    for (const auto &idx_target : map[idx]) {
-      auto ret = MergeTarget_(map, inversed_map, visited_target, visited_source,
-                              idx_target);
-      source.insert(source.end(), ret.first.begin(), ret.first.end());
-      target.insert(target.end(), ret.second.begin(), ret.second.end());
+    for (const auto& idx_target : map[idx]) {
+        auto ret = MergeTarget_(inversed_map, map, visited_source, visited_target,
+            idx_target);
+        source.insert(source.end(), ret.second.begin(), ret.second.end());
+        target.insert(target.end(), ret.first.begin(), ret.first.end());
     }
   }
   return std::make_pair(source, target);
